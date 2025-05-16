@@ -2,20 +2,29 @@ pipeline {
     agent any
 
     stages {
-        stage('Setup Python Env') {
+        stage('Clone Repo') {
+            steps {
+                echo 'Cloning repo...'
+            }
+        }
+
+        stage('Set Up Python') {
             steps {
                 sh '''
                     python3 -m venv venv
                     . venv/bin/activate
-                    pip install --upgrade pip
                     pip install flask
                 '''
             }
         }
 
-        stage('Restart Flask Service') {
+        stage('Run Flask App') {
             steps {
-                sh '''
-                    sudo systemctl restart flaskapp
+                sh '''                    
+                    . venv/bin/activate
+                    nohup python3 app.py > app.log 2>&1 &
                 '''
             }
+        }
+    }
+}
